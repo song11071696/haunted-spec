@@ -1,0 +1,51 @@
+name: Test, dogfood and publish
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      - name: Unit + property-based tests
+        run: npm test
+      - name: Dogfood - our own Kiro spec must stay Purified
+        run: node bin/haunt.mjs .kiro/specs/haunted-spec/requirements.md --max 10
+
+  publish:
+    # Static site -> gh-pages branch (GitHub Pages serves it). No third-party actions, no secrets.
+    needs: test
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assemble site
+        run: |
+          mkdir -p _site
+          cp -r index.html styles src _site/
+          [ -d assets ] && cp -r assets _site/ || true
+          touch _site/.nojekyll
+      - name: Push to gh-pages
+        run: |
+          cd _site
+          git init -q -b gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Publish ${GITHUB_SHA::7}"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" gh-pages
