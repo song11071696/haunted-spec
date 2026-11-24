@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "name": "a11y-sweep",
+  "description": "User-triggered accessibility audit and fix",
+  "version": "1",
+  "when": {
+    "type": "userTriggered"
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "Perform a full accessibility audit of index.html and all src/ui/*.mjs files. Check for: (1) keyboard operability (all interactive elements have tabindex or are natively focusable, Enter/Space handlers on custom controls), (2) visible focus indicators (2px solid border or outline, 3:1 contrast), (3) ARIA attributes (role, aria-label, aria-live, aria-modal, aria-labelledby where appropriate), (4) live regions for score and exorcism announcements, (5) respect for prefers-reduced-motion (disable animations when active). Read the steering doc .kiro/steering/spooky-ux.md for accessibility rules. Fix any issues found and update the code. After fixing, summarize what was audited and what was changed."
+  }
+}

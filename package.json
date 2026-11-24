@@ -1,0 +1,16 @@
+{
+  "name": "haunted-spec",
+  "version": "1.0.0",
+  "description": "Exorcise the ghosts haunting your requirements: a spooky, static, offline requirements linter that exports Kiro-ready EARS specs.",
+  "type": "module",
+  "license": "MIT",
+  "bin": { "haunt": "bin/haunt.mjs" },
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "haunt": "node bin/haunt.mjs",
+    "serve": "python3 -m http.server 8080"
+  },
+  "devDependencies": {
+    "fast-check": "^3.23.2"
+  }
+}

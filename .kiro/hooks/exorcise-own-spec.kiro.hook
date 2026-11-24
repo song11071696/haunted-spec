@@ -1,0 +1,14 @@
+{
+  "enabled": true,
+  "name": "exorcise-own-spec",
+  "description": "Dogfooding: lint our own spec and fix haunted acceptance criteria",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": [".kiro/specs/**/*.md"]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A spec file was just edited. Run `node bin/haunt.mjs <edited-file-path> --max 10` to check if our own spec is haunted. If the haunt score exceeds 10 or any findings are reported, read the findings and rewrite the haunted acceptance criteria to remove vague words, weak modals, ambiguity, and untestable absolutes. Apply the same exorcism rules we use in the tool: replace 'should' with 'SHALL', replace vague adjectives with measurable targets, remove 'etc.', make passive voice active. Re-run the linter after fixing to confirm the score is acceptable. This is dogfooding: our spec must pass our own linter."
+  }
+}

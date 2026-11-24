@@ -1,0 +1,14 @@
+{
+  "enabled": true,
+  "name": "test-on-core-change",
+  "description": "Run tests when core or test files are edited, fix failures without weakening tests",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": ["src/core/**/*.mjs", "test/**/*.mjs"]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "A core or test file was just edited. Run `npm test` to verify all tests pass. If any test fails, read the test file and the corresponding core module, understand why the test is failing, then fix the IMPLEMENTATION (not the test) to make the test pass. Do not weaken or skip tests. If a test is incorrect, explain why and ask for confirmation before changing it."
+  }
+}

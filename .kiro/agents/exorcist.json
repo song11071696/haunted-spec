@@ -1,0 +1,66 @@
+{
+  "name": "exorcist",
+  "description": "Implements Haunted Spec tasks from .kiro/specs/haunted-spec/tasks.md",
+  "prompt": "You are the Exorcist agent for Haunted Spec. Follow the steering docs. The spec lives in .kiro/specs/haunted-spec/ (design.md has the interfaces; read only the sections you need, never re-read files you already read). Implement exactly the task group(s) you are asked for, write complete files in one write each, keep src/core pure (no DOM), tick the finished checkboxes in tasks.md, run npm test once at the end and fix failures in the implementation, not the tests. Never ask questions; be terse.",
+  "tools": [
+    "*"
+  ],
+  "allowedTools": [
+    "fs_read",
+    "fs_write",
+    "execute_bash"
+  ],
+  "resources": [
+    "file://.kiro/steering/**/*.md"
+  ],
+  "hooks": [
+    {
+      "name": "agentSpawn-0",
+      "trigger": "agentSpawn",
+      "action": {
+        "type": "command",
+        "command": "git status --short | head -20"
+      },
+      "timeout": 10
+    },
+    {
+      "name": "postToolUse-0",
+      "trigger": "postToolUse",
+      "matcher": "write",
+      "action": {
+        "type": "command",
+        "command": "node --test test/*.test.mjs 2>&1 | grep -E '^# (pass|fail)' || true"
+      },
+      "timeout": 60
+    },
+    {
+      "name": "stop-0",
+      "trigger": "stop",
+      "action": {
+        "type": "command",
+        "command": "node --test test/*.test.mjs 2>&1 | grep -E '^# (tests|pass|fail)|not ok' | head -20"
+      },
+      "timeout": 60
+    }
+  ],
+  "permissions": {
+    "rules": [
+      {
+        "capability": "fs_read",
+        "effect": "allow"
+      },
+      {
+        "capability": "fs_write",
+        "effect": "allow"
+      },
+      {
+        "capability": "shell",
+        "effect": "allow"
+      },
+      {
+        "capability": "skill",
+        "effect": "allow"
+      }
+    ]
+  }
+}

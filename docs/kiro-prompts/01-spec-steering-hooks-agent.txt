@@ -1,0 +1,24 @@
+You are setting up spec-driven development for a new project in the current directory. Read docs/brief.md first. Do NOT write any application code yet. Create ONLY these files (write them with your file tools):
+
+1. Steering docs in .kiro/steering/ (each starts with YAML front matter `---\ninclusion: always\n---` unless noted):
+   - product.md: purpose, audience, problem, category (Costume Contest), success criteria.
+   - tech.md: stack and hard constraints (static, vanilla ES modules, no deps at runtime, relative paths for GitHub Pages sub-path, node --test + fast-check, no network).
+   - structure.md: folder layout (index.html, styles/, src/core/ pure analyzer modules, src/ui/ DOM modules, bin/haunt.mjs, test/, .kiro/), naming conventions.
+   - spooky-ux.md: tone of voice for all UI copy (playful-gothic but always clear about the actual problem and fix), the ghost roster with color + silhouette per ghost, accessibility rules (reduced motion, AA contrast, keyboard, live region), and "the costume must serve the function" principle.
+   - testing.md with front matter `---\ninclusion: fileMatch\nfileMatchPattern: "test/**/*.mjs"\n---`: how to write unit + property-based tests (fast-check) for the core.
+
+2. A Kiro spec in .kiro/specs/haunted-spec/:
+   - requirements.md in Kiro format: `# Requirements Document`, `## Introduction`, `## Glossary`, `## Requirements`, each `### Requirement N: <title>` with `**User Story:** As a ..., I want ..., so that ...` and `#### Acceptance Criteria` as numbered EARS statements (WHEN/WHILE/IF/WHERE ... THE Haunted_Spec SHALL ...). Cover: analyzer ghost rules, haunt score + its monotonicity, exorcism + idempotency, EARS transmutation, export/share/persistence, graveyard UI, exorcism card, bestiary, accessibility, CLI, offline/static deployment. Every criterion must be testable and itself free of vague words (we will lint this file with our own tool).
+   - design.md: overview, architecture (core vs ui, data flow), components and interfaces (exact exported function signatures for src/core: tokenize/classifyLine, rules, analyze(text) -> {lines, findings, score, band}, score(), exorcise(text, finding), exorciseAll(text), toEars(line), toKiroRequirements(text) ), data models, the ghost rule table, Correctness Properties (numbered, each "For any ..." statement mapped to the requirement it validates, suitable for property-based testing), error handling, testing strategy.
+   - tasks.md: an implementation plan as a markdown checklist `- [ ] 1. ...` with sub-tasks `- [ ] 1.1 ...`, each ending with `_Requirements: x.y_`, ordered so the pure core + tests come first, then CLI, then UI shell, graveyard, exorcism card, export, polish/accessibility, then GitHub Pages workflow. Mark property-test sub-tasks clearly ("Write property test for Property N").
+
+3. Agent hooks for the Kiro IDE in .kiro/hooks/ (JSON files with extension .kiro.hook, schema: {"enabled": true, "name": string, "description": string, "version": "1", "when": {"type": "fileEdited" | "fileCreated" | "userTriggered", "patterns": [globs]}, "then": {"type": "askAgent", "prompt": string} }):
+   - test-on-core-change.kiro.hook: when src/core/**/*.mjs or test/**/*.mjs edited -> run `npm test` and fix failures without weakening tests.
+   - exorcise-own-spec.kiro.hook: when .kiro/specs/**/*.md edited -> run `node bin/haunt.mjs <edited file> --max 10` and rewrite any haunted acceptance criteria it reports (dogfooding).
+   - bestiary-sync.kiro.hook: when src/core/ghosts.mjs edited -> update the Ghost Bestiary table in README.md to match.
+   - a11y-sweep.kiro.hook: userTriggered -> audit index.html and src/ui for keyboard, focus, aria-live and reduced-motion issues and fix them.
+
+4. A custom Kiro CLI agent at .kiro/agents/exorcist.json for implementing the tasks headlessly:
+{"name":"exorcist","description":"Implements Haunted Spec tasks from .kiro/specs/haunted-spec/tasks.md","prompt":"<a short system prompt: follow the spec + steering, implement one task group at a time, tick checkboxes in tasks.md when done, keep core pure, run npm test before finishing>","tools":["*"],"allowedTools":["fs_read","fs_write","execute_bash"],"resources":["file://.kiro/steering/**/*.md","file://.kiro/specs/haunted-spec/*.md"],"hooks":{"agentSpawn":[{"command":"git status --short | head -20"}],"postToolUse":[{"matcher":"fs_write","command":"npm test --silent 2>&1 | tail -15 || true"}],"stop":[{"command":"npm test --silent 2>&1 | tail -25"}]}}
+
+Keep everything concise but complete. When finished, print a short list of the files you created.

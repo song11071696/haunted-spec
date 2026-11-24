@@ -1,0 +1,14 @@
+{
+  "enabled": true,
+  "name": "bestiary-sync",
+  "description": "Sync Ghost Bestiary table in README when ghosts.mjs is edited",
+  "version": "1",
+  "when": {
+    "type": "fileEdited",
+    "patterns": ["src/core/ghosts.mjs"]
+  },
+  "then": {
+    "type": "askAgent",
+    "prompt": "The ghost definitions in src/core/ghosts.mjs were just edited. Read the GHOSTS array in that file, extract the name, color, and description (or severity/pattern summary) for each ghost, then update the Ghost Bestiary table in README.md to match. The table should have columns: Ghost Name, Color, Description. Ensure the README accurately reflects the current ghost definitions in the code."
+  }
+}
