@@ -64,7 +64,7 @@ skipped. User stories are judged on their words (vagueness, ambiguity, absolutes
 
 ```bash
 node bin/haunt.mjs path/to/requirements.md            # list ghosts + score
-node bin/haunt.mjs path/to/requirements.md --max 10   # exit 1 if score > 10 (CI gate)
+node bin/haunt.mjs path/to/requirements.md --max 10   # exit 1 if score > 10 (usable as a CI gate)
 node bin/haunt.mjs path/to/requirements.md --fix      # print the exorcised text
 node bin/haunt.mjs path/to/requirements.md --kiro     # print a Kiro requirements.md
 node bin/haunt.mjs path/to/requirements.md --json     # full report
@@ -81,10 +81,17 @@ src/ui/     (browser modules)     editor, graveyard, ghost-art (7 inline SVG sil
 bin/haunt.mjs                     CLI on the same core
 test/                             node:test unit tests + fast-check property-based tests
 .kiro/                            specs, steering, hooks and the custom agent used to build this
-.github/workflows/pages.yml       test → dogfood gate → publish to GitHub Pages
+.github/workflows/pages.yml       included workflow: test → dogfood gate → publish (not yet run, see below)
 ```
 
 No framework, no bundler, no runtime dependencies. `fast-check` is the only dev dependency.
+
+## Deployment
+
+The live site is served by GitHub Pages from the `gh-pages` branch, which holds the static files (`index.html`,
+`styles/`, `src/`). The workflow in `.github/workflows/pages.yml` (tests → dogfood gate → publish to `gh-pages`) is
+included in the repo, but it has not run yet: the current `gh-pages` branch was published directly, and the tests and
+the dogfood check were run locally (`npm test`, `node bin/haunt.mjs .kiro/specs/haunted-spec/requirements.md --max 10`).
 
 ---
 
@@ -149,8 +156,9 @@ The `exorcise-own-spec` hook was run against Kiro's own `requirements.md`. Haunt
 written into its own acceptance criteria (lines that listed "should/may/fast" unquoted, compound "and download"
 criteria, a few "is rendered" passives: 19/100 on the first pass); Kiro then rewrote those lines until the linter
 reported **0 ghosts, 0/100 Purified**.
-The same check runs in CI (`node bin/haunt.mjs .kiro/specs/haunted-spec/requirements.md --max 10`), so the spec can
-never silently become haunted again.
+The same check can be run by anyone (`node bin/haunt.mjs .kiro/specs/haunted-spec/requirements.md --max 10`), and it
+is wired into the included GitHub Actions workflow as a gate, so the spec cannot silently become haunted again once
+the workflow is enabled.
 
 ### 6. Property-based testing caught what unit tests missed
 `test/properties.test.mjs` implements the design's correctness properties with fast-check (500 runs each):
