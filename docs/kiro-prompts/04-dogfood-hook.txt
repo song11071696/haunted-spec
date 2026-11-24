@@ -1,0 +1,11 @@
+(Kiro CLI, --agent exorcist, Claude Haiku 4.5) - executing the exorcise-own-spec hook
+Agent hook 'exorcise-own-spec' fired for .kiro/specs/haunted-spec/requirements.md. Run:
+node bin/haunt.mjs .kiro/specs/haunted-spec/requirements.md --max 0 . For each reported line, edit ONLY that line so the
+ghost is gone while the meaning is kept: when a line merely LISTS example ghost words, wrap each listed word in double
+quotes (quoted words are mentions and are not linted); when a line genuinely uses a vague/weak/absolute word, replace it
+with a measurable statement; split Two-Headed lines into two numbered criteria. Re-run the linter until it prints
+'Haunt score: 0/100'.
+
+Outcome: the hook run took requirements.md from 65 findings on 17 lines to 0 findings, 0/100 Purified.
+(Kiro's first draft had scored 19/100 Restless under an early version of the rules; the rules then learned to
+skip Introduction/Glossary prose and quoted mentions.)

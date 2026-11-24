@@ -1,0 +1,8 @@
+(Kiro CLI, --agent exorcist, low-cost model)
+Read .kiro/specs/haunted-spec/design.md once, then implement task groups 2-10 of tasks.md. Create: src/core/tokenize.mjs,
+src/core/ghosts.mjs (7 ghosts from the design table), src/core/score.mjs, src/core/analyze.mjs, src/core/exorcise.mjs,
+src/core/ears.mjs, src/core/index.mjs, unit tests and fast-check property tests, and bin/haunt.mjs (<file> [--max N] [--json]).
+Then run npm test and fix until green, tick boxes 2-10 in tasks.md.
+
+Outcome: a first draft of the core; property tests exposed an infinite loop on empty lines and non-idempotent fixes,
+so the core was reworked against the design's correctness properties (see README, "Property-based testing").
