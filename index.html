@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Haunted Spec - Exorcise the ghosts haunting your requirements</title>
+  <meta name="description" content="A client-side requirements linter that surfaces vague, ambiguous, and untestable language in requirements documents and offers one-click fixes.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>👻</text></svg>">
+  <link rel="stylesheet" href="styles/main.css">
+  <script type="module" src="src/ui/main.mjs"></script>
+</head>
+<body data-band="Restless">
+  <header>
+    <div class="header-content">
+      <h1>Haunted Spec</h1>
+      <p class="tagline">Exorcise the ghosts haunting your requirements</p>
+      <div class="controls">
+        <label class="sample-label" for="sample-menu">Load a cursed scroll</label>
+        <select id="sample-menu" class="sample-select"></select>
+        <button id="exorcise-all" type="button">Exorcise all</button>
+        <button id="undo" type="button" disabled>Undo</button>
+        <button id="toggle-bestiary" type="button">Bestiary</button>
+        <button id="export" type="button">Export</button>
+        <button id="toggle-sound" type="button" aria-pressed="false" aria-label="Ambient sound">Sound: off</button>
+      </div>
+    </div>
+    <div id="haunt-meter" class="haunt-meter">
+      <svg class="moon" width="120" height="120" viewBox="0 0 120 120" aria-hidden="true">
+        <defs>
+          <radialGradient id="moon-glow">
+            <stop offset="60%" stop-color="currentColor" stop-opacity="0.3"/>
+            <stop offset="100%" stop-color="currentColor" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+        <circle cx="60" cy="60" r="55" fill="url(#moon-glow)"/>
+        <circle cx="60" cy="60" r="35" fill="currentColor" class="moon-face"/>
+      </svg>
+      <div class="meter-text" role="status" aria-live="polite">
+        <div class="score">0</div>
+        <div class="band">Purified</div>
+        <div class="blurb">No ghosts detected</div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="grimoire-section">
+      <h2>The Grimoire</h2>
+      <p class="editor-hint">Paste your requirements or user stories. Double-click a glowing word (or press Alt+Enter on it) to summon its ghost.</p>
+      <div class="editor-container">
+        <div class="line-numbers" aria-hidden="true"></div>
+        <div class="editor-wrapper">
+          <pre class="highlight-overlay" aria-hidden="true"></pre>
+          <textarea 
+            id="grimoire" 
+            class="grimoire-editor" 
+            role="textbox"
+            aria-multiline="true"
+            aria-label="Requirements editor"
+            spellcheck="false"
+            placeholder="Paste your requirements here..."></textarea>
+        </div>
+      </div>
+    </section>
+
+    <section class="graveyard-section">
+      <h2>The Graveyard</h2>
+      <p class="editor-hint">Every requirement is a tombstone. Click a ghost to exorcise it.</p>
+      <div id="graveyard" class="graveyard">
+        <div class="sky"></div>
+        <div class="stars" aria-hidden="true"></div>
+        <div class="fog fog-1" aria-hidden="true"></div>
+        <div class="fog fog-2" aria-hidden="true"></div>
+        <div class="tombstones"></div>
+        <div class="fence" aria-hidden="true"></div>
+        <div class="ground"></div>
+      </div>
+    </section>
+  </main>
+
+  <aside id="bestiary" class="bestiary" hidden>
+    <div class="bestiary-header">
+      <h2>Ghost Bestiary</h2>
+      <button id="close-bestiary" type="button" aria-label="Close bestiary">✕</button>
+    </div>
+    <div class="bestiary-content" role="region" aria-label="Ghost Bestiary"></div>
+  </aside>
+
+  <dialog id="exorcism-card" class="exorcism-card" aria-modal="true">
+    <div class="card-content"></div>
+  </dialog>
+
+  <dialog id="export-dialog" class="export-dialog" aria-modal="true">
+    <h2>Export to Kiro Format</h2>
+    <pre class="export-preview"></pre>
+    <div class="export-actions">
+      <button id="download-md" type="button">Download requirements.md</button>
+      <button id="copy-text" type="button">Copy</button>
+      <button id="copy-share" type="button">Copy share link</button>
+      <button id="close-export" type="button">Close</button>
+    </div>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+
+  <footer>
+    <p>Built with Kiro for Kiroween 2026 — 100% offline, nothing leaves your browser</p>
+    <p><a href="https://github.com/song11071696/haunted-spec" target="_blank" rel="noopener">View on GitHub</a></p>
+  </footer>
+</body>
+</html>
