@@ -1,0 +1,10 @@
+https://github.com/w3c/openscreenprotocol/blob/fd752422140686dd10fbab082f05e0b97f1d61c3/requirements.md
+https://github.com/aws-samples/saga-orchestration-netcore-blog/blob/2945d626eb17bbb2703a53e9cfd08e6bc344e228/requirements.md
+https://github.com/Skiet88/campus-lost-and-found/blob/fe1b303f9ba04560d5d586caf744afedc7a04fa0/REQUIREMENTS.md
+https://github.com/ThatoMabilo/SmartLibraryManagementSystem/blob/cbbc9c21e9b96044afe7693a9715cd731d0a0dde/REQUIREMENTS.md
+https://github.com/eonum/geopitalsuisse/blob/203fa4805a4aebbe873e13fffc1078d752469a7b/requirements.md
+https://github.com/crawlab-team/artipub/blob/c67d6006dc695b8199e284d262e4c263f6093ab1/.kiro/specs/ui-redesign/requirements.md
+https://github.com/RankFTW/RHI/blob/a866ff8c2f7e2319737e004c3afb336ee1de1035/.kiro/specs/ui-themes/requirements.md
+https://github.com/sebsto/wispr/blob/db897155f6a695b2d1080c7919adc8f2c8ea931d/.kiro/specs/cli-tool/requirements.md
+https://github.com/soc221b/zod-schema-faker/blob/f75414424f8e6243286909a17e3bb8d9a3997a0e/.kiro/specs/v4-file/requirements.md
+https://github.com/chara-codes/chara/blob/b9db6425a48faf3dc5e43f404c8837377afc9a88/.kiro/specs/dark-theme/requirements.md

@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "haunted-spec": {
+      "command": "node",
+      "args": ["bin/haunt-mcp.mjs"],
+      "autoApprove": ["analyze", "exorcise"]
+    }
+  }
+}

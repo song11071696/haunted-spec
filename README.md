@@ -72,6 +72,59 @@ node bin/haunt.mjs path/to/requirements.md --json     # full report
 
 - **Run locally:** `npm install && npm test`, then serve the folder (`npm run serve`) and open http://localhost:8080.
 
+### Use it from Kiro (MCP server)
+
+`bin/haunt-mcp.mjs` is a zero-dependency [Model Context Protocol](https://modelcontextprotocol.io) server (stdio) on the
+same core. It exposes two tools:
+
+- **`analyze`** `{ text | path }` → haunt score, band and every finding (line, rule, matched words, why, suggested fix)
+- **`exorcise`** `{ text | path, format?: "text" | "kiro" }` → the auto-fixed text (or a Kiro `requirements.md`) with
+  before/after scores. Every `‹placeholder›` it inserts is a value a person still has to choose.
+
+This repo already ships `.kiro/settings/mcp.json`, so opening it in Kiro picks the server up. To use it in **your own
+project**, clone this repo and add it to `.kiro/settings/mcp.json` (workspace) or `~/.kiro/settings/mcp.json` (user):
+
+```json
+{
+  "mcpServers": {
+    "haunted-spec": {
+      "command": "node",
+      "args": ["/absolute/path/to/haunted-spec/bin/haunt-mcp.mjs"],
+      "autoApprove": ["analyze", "exorcise"]
+    }
+  }
+}
+```
+
+Then ask Kiro, for example: *"Run haunted-spec analyze on .kiro/specs/my-feature/requirements.md and fix the findings
+before writing design.md."* (`path` is resolved against the server's working directory; pass `text` if unsure.)
+
+Tested with the official MCP TypeScript SDK client (`@modelcontextprotocol/sdk` 1.32.2: initialize, list tools, both
+tools, error cases) and by `test/mcp.test.mjs` in `npm test`. We have not yet run it inside the Kiro app itself.
+
+## Measured on real specs
+
+We ran the linter on 10 public requirement documents from GitHub (5 hand-written, 5 Kiro specs; full table, sources
+and a re-run script in [docs/measured.md](docs/measured.md)):
+
+- **153 of 463 requirement lines (33%) were flagged**: 37% of lines in the hand-written docs, 26% in the Kiro specs.
+  Kiro's EARS format removes most shape problems; the words left behind (*appropriate*, *gracefully*, *real-time*,
+  *immediately*, actor-less passives, two actions in one criterion) are what Haunted Spec still finds.
+- **Hand-judged usefulness:** in v1.0 only 14 of 40 random findings were useful (35%), mostly because the EARS-shape
+  rule fired on wrapped prose and metadata lines. v1.1 fixes that: **18 of 25 (72%)** random findings were useful on 6
+  held-out documents. The passive-voice rule is still the noisiest (2 of 5 useful).
+- **Not measured yet:** whether cleaning a spec changes what an agent builds. We make no claim about that.
+
+## Limits
+
+- **English only.** The rules are English word lists and patterns; a Chinese or Spanish spec gets no word-level findings.
+- **It matches words, not meaning.** "Respond fast" is flagged; "respond in a timely manner" or "only recent attempts
+  count" is not, because no rule lists those words. A precise-sounding but wrong number is never flagged.
+- **It misses whatever no rule covers:** missing requirements, contradictions between lines, wrong business rules,
+  undefined terms, and edge cases nobody wrote down. A Purified score means "no known ghost words", not "correct spec".
+- **Some findings are noise** (about 3 in 10 in our sample), especially passive voice where the actor is obvious from
+  context. Suggested fixes insert `‹placeholders›`; the real numbers must come from a person.
+
 ## How it is built
 
 ```
@@ -79,6 +132,8 @@ index.html, styles/main.css       static shell, gothic theme, reduced-motion + f
 src/core/   (pure, DOM-free)      tokenize → ghosts (rules + fixes) → score → analyze → exorcise → ears (EARS + Kiro export)
 src/ui/     (browser modules)     editor, graveyard, ghost-art (7 inline SVG silhouettes), meter, card, bestiary, export, sound, samples, main
 bin/haunt.mjs                     CLI on the same core
+bin/haunt-mcp.mjs                 MCP server (stdio) on the same core: analyze, exorcise
+docs/measured.md                  results on 10 public requirement docs + re-run script
 test/                             node:test unit tests + fast-check property-based tests
 .kiro/                            specs, steering, hooks and the custom agent used to build this
 .github/workflows/pages.yml       included workflow: test → dogfood gate → publish (not yet run, see below)
@@ -198,6 +253,10 @@ formula), and the Kiro-generated UI received a polish pass (wiring it to the rea
 dialog centring, samples that trigger every ghost). The GitHub Actions workflow, LICENSE and package.json were written
 directly. Everything under `.kiro/` is Kiro output, kept as-is except for trimming the agent's resources and hook
 commands to save credits.
+
+The v1.1 update (Nov 26) was also written outside Kiro, because our sandbox's Kiro CLI session could not be signed in
+again: the MCP server (`bin/haunt-mcp.mjs`, `.kiro/settings/mcp.json`), the shape-rule fix that came out of the
+measurement (`src/core/tokenize.mjs`), their tests, and `docs/measured.md`. The web app's samples score exactly as before.
 
 ---
 

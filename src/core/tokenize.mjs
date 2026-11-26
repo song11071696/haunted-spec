@@ -16,7 +16,30 @@
 /** @typedef {'blank'|'heading'|'code'|'meta'|'userStory'|'requirement'|'note'|'prose'} LineType */
 
 const PROSE_SECTION = /^#+\s*(introduction|glossary|overview|background|context|notes?|terms|definitions|out of scope|non-goals)\b/i;
-/** @typedef {{ text: string, index: number, offset: number, type: LineType, bodyStart: number }} Line */
+/** @typedef {{ text: string, index: number, offset: number, type: LineType, bodyStart: number, shapeExempt?: boolean }} Line */
+
+// A bold label that introduces a requirement ("**Requirement:** ...") vs. one that introduces metadata
+// ("**Stakeholder:** ...", "- **Fault Injection**: ...").
+const LABEL = /^\*\*([^*]+?):?\*\*:?\s+\S/;
+const REQ_LABEL = /requirement|criteri|rule|story|shall/i;
+
+/**
+ * Is this requirement line exempt from the EARS-shape rule (Wandering Soul)?
+ * Measured on 10 public requirement docs (README "Measured on real specs"): most Wandering Soul
+ * false positives were hard-wrapped prose, metadata labels and multi-sentence descriptions.
+ * Word-level ghosts still run on these lines; only the "no SHALL" rule is skipped.
+ */
+function isShapeExempt(raw, i, isBullet) {
+  const body = raw[i].slice(bodyStart(raw[i])).trim();
+  const label = LABEL.exec(body);
+  if (label && !REQ_LABEL.test(label[1])) return true;            // metadata label line
+  if (/[.!?]\s+["'(*]?[A-Z]/.test(body.replace(/\b(?:e\.g|i\.e|etc|vs|approx)\./gi, ''))) return true; // 2+ sentences = prose
+  if (isBullet) return false;
+  if (/^[a-z`,;:)]/.test(body)) return true;                   // continuation of a wrapped line
+  const textLine = (j) => j >= 0 && j < raw.length && raw[j].trim() !== '' && !BULLET.test(raw[j])
+    && !/^\s*(#|```|~~~|\||>|<!--|---)/.test(raw[j]);
+  return textLine(i - 1) || textLine(i + 1);                        // part of a multi-line paragraph
+}
 
 const BULLET = /^(\s*(?:[-*+]|\d+(?:\.\d+)*[.)])\s+)/;
 const STORY = /^(?:\*\*user story:?\*\*:?\s*)?as an?\s+.+?,?\s+i (?:want|need|would like)\b/i;
@@ -59,6 +82,7 @@ export function classifyLine(line) {
 export function tokenize(text) {
   if (typeof text !== 'string' || text === '') return [];
   const raw = text.split('\n');
+  const clean = raw.map((r) => r.replace(/\r$/, ''));
   const out = [];
   let offset = 0;
   let inFence = false;
@@ -91,7 +115,9 @@ export function tokenize(text) {
       }
       else if (inProse && type === 'requirement') type = 'prose';
     }
-    out.push({ text: lineText, index: i, offset, type, bodyStart: bodyStart(lineText) });
+    const entry = { text: lineText, index: i, offset, type, bodyStart: bodyStart(lineText) };
+    if (type === 'requirement' && isShapeExempt(clean, i, BULLET.test(lineText))) entry.shapeExempt = true;
+    out.push(entry);
     offset += raw[i].length + 1;
   }
   return out;

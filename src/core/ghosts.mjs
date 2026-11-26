@@ -200,6 +200,7 @@ export const GHOSTS = [
     why: 'A sentence without SHALL is a wish, not a requirement. EARS ("WHEN <trigger>, THE SYSTEM SHALL <response>") makes it testable.',
     detect: (m, line) => {
       if (hasShall(m)) return [];
+      if (line && line.shapeExempt) return []; // wrapped prose, metadata label or multi-sentence description
       if (new RegExp(`${B}(?:should|may|might|could|would)${E}`, 'i').test(m)) return []; // the Wraith owns this line
       const start = line ? line.bodyStart : 0;
       const end = m.replace(/\s+$/, '').length;
@@ -265,7 +266,7 @@ export const GHOST_BY_ID = Object.fromEntries(GHOSTS.map((g) => [g.id, g]));
  */
 export function detectGhosts(line) {
   const masked = mask(line.text);
-  const lineInfo = { bodyStart: line.bodyStart ?? 0 };
+  const lineInfo = { bodyStart: line.bodyStart ?? 0, shapeExempt: !!line.shapeExempt };
   const findings = [];
   for (const ghost of GHOSTS) {
     for (const h of ghost.detect(masked, lineInfo)) {
